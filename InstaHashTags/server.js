@@ -1,13 +1,5 @@
 
 //'use strict';
-//var http = require('http');
-//var port = process.env.PORT || 1337;
-
-//http.createServer(function (req, res) {
-//    res.writeHead(200, { 'Content-Type': 'application/json' });
-//    res.end(JSON.stringify({text:'hello world'}));
-//}).listen(port);
-
 var express = require('express');
 var fs = require('fs');
 var request = require('request');
@@ -18,6 +10,29 @@ var scrapper = require('./scrapper.js');
 app.get('/scrape', function (req, res) {
 
     url = 'http://instatag.net/mostpopular.html';
+
+    request(url, function (error, res, html) {
+        if (!error) {
+            var $ = cheerio.load(html);
+            var tags = $('textarea').text();
+            var header = $('h2', '.blog').text();
+            var hashtag;
+            var title;
+            var json = {
+                title: title,
+                hastags: hashtag
+            }
+
+            json.hastags = tags;
+            json.title = header;
+
+            fs.writeFileSync('output.json', json, function (err) {
+                if (err) console.error(err);
+                console.log('File successfully written! - Check your project directory for the output.json file');
+
+            })
+        }
+    })
 
     
 })
